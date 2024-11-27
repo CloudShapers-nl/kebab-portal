@@ -1,0 +1,81 @@
+.orders = set();
+
+set_type("Order", {
+	id: "#",
+	ordererName: "str",
+	ordererUpn: "str",
+	datetime: "datetime",
+	menuItems: "{MenuItem}",
+	sauces: "{Sauce}",
+	modifications: "{Modification}",
+});
+
+mod_type("Order", "add", "addMenuItem", |this, menuItem| {
+    "Add a new menu item to the order";
+    type_assert(menuItem, "MenuItem");
+
+    return this.menuItems.add(menuItem);
+});
+
+mod_type("Order", "add", "addSauce", |this, sauce| {
+    "Add a new sauce to the order";
+    type_assert(sauce, "Sauce");
+
+    return this.sauces.add(sauce);
+});
+
+mod_type("Order", "add", "addModification", |this, modification| {
+    "Add a new modification to the order";
+    type_assert(modification, "Modification");
+
+    return this.modifications.add(modification);
+});
+
+new_procedure("addOrder", |ordererName, ordererUpn, menuItems, sauces, modifications| {
+	"Add a new order";
+	assert(is_str(ordererName) && ordererName);
+	assert(is_str(ordererUpn) && ordererUpn);
+
+	if (hasUpnOrdered(ordererUpn)) {
+		raise("has already ordered today");
+	};
+
+	newOrder = Order{
+		ordererName: ordererName,
+		ordererUpn: ordererUpn,
+	};
+	if (menuItems != nil) {
+		newOrder.menuItems = menuItems;
+	};
+	if (sauces != nil) {
+		newOrder.sauces = sauces;
+	};
+	if (modifications != nil) {
+		newOrder.modifications = modifications;
+	};
+
+	.orders.add(newOrder);
+	return newOrder;
+
+});
+
+new_procedure("hasUpnOrdered", |ordererUpn| {
+	"Check if a specific upn has already ordered today";
+	assert(is_str(ordererUpn) && ordererUpn);
+
+	foundOrders = .orders.filter(|x| x.ordererUpn == ordererUpn);
+	for (item in foundOrders) {
+		if (item.datetime.extract().year != datetime().extract().year) {
+			continue;
+		};
+		if (item.datetime.extract().month != datetime().extract().month) {
+			continue;
+		};
+		if (item.datetime.extract().day != datetime().extract().day) {
+			continue;
+		};
+		return true;
+	};
+
+	return false;
+});

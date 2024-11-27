@@ -1,0 +1,48 @@
+.menuItems = set();
+
+set_type("MenuItem", {
+	id: "#",
+	name: "str",
+	price: "float",
+	allowedModifications: "{Modification}",
+});
+
+mod_type("MenuItem", "add", "allowNewModification", |this, newModification| {
+	"Add a new allowed modification to the menu item";
+	type_assert(newModification, "Modification");
+
+	return this.allowedModifications.add(newModification);
+});
+
+new_procedure("addMenuItem", |name, price, allowedModificationIds| {
+    "Add a new menu item to the list";
+    assert(is_str(name) && name);
+    assert(is_float(price) && price);
+
+    // Check if item with that name already exists
+    if (getMenuItemByName(name) != nil) {
+        raise("menu item with that name already exists");
+    };
+
+    newMenuItem = MenuItem{
+        name: name,
+        price: price,
+        allowedModificationIds: allowedModificationIds,
+    };
+
+    .menuItems.add(newMenuItem);
+});
+
+new_procedure("getMenuItemById", |menuItemId| {
+    "Get a specific menu item by id";
+    assert(is_int(menuItemId) && menuItemId);
+
+    .menuItems.find(|x| x.id() == menuItemId);
+});
+
+new_procedure("getMenuItemByName", |menuItemName| {
+    "Get a specific menu item by name";
+    assert(is_str(menuItemName) && menuItemName);
+
+    .menuItems.find(|x| x.name == menuItemName);
+});

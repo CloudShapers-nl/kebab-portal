@@ -1,0 +1,37 @@
+.modifications = set();
+
+set_type("Modification", {
+	id: "#",
+	description: "str"
+});
+
+new_procedure("addModification", |description| {
+	"Add a new modification";
+	assert(is_str(description) && description);
+
+	// Check if modification with description already exists
+	if (getModificationByDescription(description) != nil) {
+		raise("modification with that description already exists");
+	};
+
+	newModification = Modification{
+		description: description,
+	};
+
+	.modifications.add(newModification);
+	return newModification;
+});
+
+new_procedure("getModificationById", |id| {
+	"Get a specific modification based on its id";
+	assert(is_int(id) && id);
+
+	.modifications.find(|x| x.id() == id);
+});
+
+new_procedure("getModificationByDescription", |description| {
+	"Get a specific modification based on its description";
+	assert(is_str(description) && description);
+
+	.modifications.find(|x| x.description == description);
+});

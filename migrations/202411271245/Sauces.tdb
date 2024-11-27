@@ -1,0 +1,46 @@
+.sauces = set();
+
+set_type("Sauce", {
+    id: "#",
+    name: "str",
+    spiceLevel: "int<1:3>",
+});
+
+new_procedure("addSauce", |name, spiceLevel| {
+    "Add a new sauce to the list of available sauces";
+    assert(is_str(name) && name);
+    assert(is_int(spiceLevel) && spiceLevel > 0 && spiceLevel < 4); // Assert that the spice level ranges from 1 to 3
+
+    // Check if sauce with that name already exists
+    if (getSauceByName(name) != nil) {
+        raise("sauce with that name already exists");
+    };
+
+    newSauce = Sauce{
+        name: name,
+        spiceLevel: spiceLevel,
+    };
+
+    .sauces.add(newSauce);
+});
+
+new_procedure("getSauceById", |sauceId| {
+    "Get a specific sauce based on it's ID";
+    assert(is_int(sauceId) && sauceId);
+
+    .sauces.find(|x| x.id() == sauceId);
+});
+
+new_procedure("getSauceByName", |name| {
+    "Get a specific sauce based on it's name";
+    assert(is_str(name) && name);
+
+    .sauces.find(|x| x.name == name);
+});
+
+new_procedure("getSaucesBySpiceLevel", |spiceLevel| {
+    "Get a list of sauces based on a specific spice level";
+    assert(is_int(spiceLevel) && spiceLevel);
+
+    .sauces.filter(|x| x.spiceLevel == spiceLevel);
+});
